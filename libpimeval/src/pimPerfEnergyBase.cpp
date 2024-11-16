@@ -9,6 +9,7 @@
 #include "pimPerfEnergyBitSerial.h"
 #include "pimPerfEnergyFulcrum.h"
 #include "pimPerfEnergyBankLevel.h"
+#include "pimPerfEnergyLUT.h"
 #include <iostream>
 
 
@@ -29,6 +30,9 @@ pimPerfEnergyFactory::createPerfEnergyModel(const pimPerfEnergyModelParams& para
     case PIM_DEVICE_BANK_LEVEL:
       std::cout << "PIM-Info: Created performance energy model for bank-level PIM" << std::endl;
       return std::make_unique<pimPerfEnergyBankLevel>(params);
+    case PIM_DEVICE_LUT:
+      std::cout << "PIM-Info: Created performance energy model for PIM_DEVICE_LUT" << std::endl;
+      return std::make_unique<pimPerfEnergyLUT>(params);
     default:
       std::cout << "PIM-Warning: Created performance energy base model for unrecognized simulation target" << std::endl;
   }

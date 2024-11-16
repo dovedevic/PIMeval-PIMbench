@@ -61,6 +61,8 @@ pimDevice::adjustConfigForSimTarget(unsigned& numRanks, unsigned& numBankPerRank
     numRows *= numSubarrayPerBank;
     numSubarrayPerBank = 1;
     break;
+  case PIM_DEVICE_LUT:
+    break;
   default:
     assert(0);
   }
@@ -100,6 +102,7 @@ pimDevice::isVLayoutDevice() const
   case PIM_DEVICE_BITSIMD_H: return false;
   case PIM_DEVICE_FULCRUM: return false;
   case PIM_DEVICE_BANK_LEVEL: return false;
+  case PIM_DEVICE_LUT: return false;
   case PIM_DEVICE_NONE:
   case PIM_FUNCTIONAL:
   default:
@@ -123,6 +126,7 @@ pimDevice::isHLayoutDevice() const
   case PIM_DEVICE_BITSIMD_H: return true;
   case PIM_DEVICE_FULCRUM: return true;
   case PIM_DEVICE_BANK_LEVEL: return true;
+  case PIM_DEVICE_LUT: return true;
   case PIM_DEVICE_NONE:
   case PIM_FUNCTIONAL:
   default:
