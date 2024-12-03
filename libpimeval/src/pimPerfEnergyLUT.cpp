@@ -50,12 +50,13 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     }
     case PimCmdEnum::ADD_SCALAR:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
       }
       else{
         // Calculate the number of ALU operations needed for carry handling
-        unsigned numberOfALUOperationPerElement = ceil((unsigned)bitsPerElement / m_lutBitWidth) - 1;
+        unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
+        unsigned numberOfALUOperationPerElement = numChunks - 1;
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
       } 
       break;     
@@ -63,7 +64,7 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     
     case PimCmdEnum::MUL_SCALAR:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
       }
       else{
@@ -77,6 +78,7 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     }
     case PimCmdEnum::SUB_SCALAR:
     case PimCmdEnum::DIV_SCALAR:
+    case PimCmdEnum::ABS:
     {
       double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
       msRuntime = m_tR + m_tW + (maxElementsPerRegion * m_fulcrumAluLatency * numberOfALUOperationPerElement * numPass);
@@ -84,10 +86,10 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
       mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       break;
     }
-    case PimCmdEnum::ABS:
-    {
-      break;
-    }
+    // case PimCmdEnum::ABS:
+    // {
+    //   break;
+    // }
     case PimCmdEnum::AND_SCALAR:
     case PimCmdEnum::OR_SCALAR:
     case PimCmdEnum::XOR_SCALAR:
@@ -100,7 +102,7 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     case PimCmdEnum::SHIFT_BITS_L:
     case PimCmdEnum::SHIFT_BITS_R:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass);
       }
       else{
@@ -147,21 +149,23 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
   {
     case PimCmdEnum::ADD:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
       }
       else{
         // Calculate the number of ALU operations needed for carry handling
-        unsigned numberOfALUOperationPerElement = ceil((unsigned)bitsPerElement / m_lutBitWidth) - 1;
+        unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
+        unsigned numberOfALUOperationPerElement = numChunks - 1;
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)); // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        // std::cout<< "msRuntime: " << msRuntime << std::endl;
       } 
       break;     
     }
     case PimCmdEnum::MUL:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
       }
@@ -202,7 +206,7 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
     case PimCmdEnum::MIN:
     case PimCmdEnum::MAX:
     {
-      if(m_lutBitWidth <= 4){
+      if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
       }
