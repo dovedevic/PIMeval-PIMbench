@@ -65,7 +65,9 @@ enum PimCopyEnum {
 
 //! @brief  PIM datatypes
 enum PimDataType {
-  PIM_INT8 = 0,
+  PIM_INT4 = 0,  // Added 4-bit signed integer type
+  PIM_UINT4,     // Added 4-bit unsigned integer type
+  PIM_INT8,
   PIM_INT16,
   PIM_INT32,
   PIM_INT64,

@@ -387,8 +387,8 @@ pimCmdFunc1::computeRegion(unsigned index)
   unsigned numElementsInRegion = srcRegion.getNumElemInRegion();
   for (unsigned j = 0; j < numElementsInRegion; ++j) {
     uint64_t elemIdx = elemIdxBegin + j;
-    bool isSigned = (dataType == PIM_INT8 || dataType == PIM_INT16 || dataType == PIM_INT32 || dataType == PIM_INT64);
-    bool isUnsigned = (dataType == PIM_UINT8 || dataType == PIM_UINT16 || dataType == PIM_UINT32 || dataType == PIM_UINT64);
+    bool isSigned = (dataType == PIM_INT4 || dataType == PIM_INT8 || dataType == PIM_INT16 || dataType == PIM_INT32 || dataType == PIM_INT64);
+    bool isUnsigned = (dataType == PIM_UINT4 || dataType == PIM_UINT8 || dataType == PIM_UINT16 || dataType == PIM_UINT32 || dataType == PIM_UINT64);
     bool isFP = (dataType == PIM_FP32);
     if (isSigned) {
       int64_t signedOperand = objSrc.getElementBits(elemIdx);
@@ -493,8 +493,8 @@ pimCmdFunc2::computeRegion(unsigned index)
   unsigned numElementsInRegion = src1Region.getNumElemInRegion();
   for (unsigned j = 0; j < numElementsInRegion; ++j) {
     uint64_t elemIdx = elemIdxBegin + j;
-    bool isSigned = (dataType == PIM_INT8 || dataType == PIM_INT16 || dataType == PIM_INT32 || dataType == PIM_INT64);
-    bool isUnsigned = (dataType == PIM_UINT8 || dataType == PIM_UINT16 || dataType == PIM_UINT32 || dataType == PIM_UINT64);
+    bool isSigned = (dataType == PIM_INT4 || dataType == PIM_INT8 || dataType == PIM_INT16 || dataType == PIM_INT32 || dataType == PIM_INT64);
+    bool isUnsigned = (dataType == PIM_UINT4 || dataType == PIM_UINT8 || dataType == PIM_UINT16 || dataType == PIM_UINT32 || dataType == PIM_UINT64);
     bool isFP = (dataType == PIM_FP32);
     if (isSigned) {
       uint64_t operandBits1 = objSrc1.getElementBits(elemIdx);

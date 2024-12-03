@@ -38,6 +38,11 @@ namespace pimUtils
   // Output: Sign-extended bits represented as uint64_t
   inline uint64_t signExt(uint64_t bits, PimDataType dataType) {
     switch (dataType) {
+      case PIM_INT4:
+            if (bits & 0x8) {  // If the 4th bit is set (negative number)
+                return 0xFFFFFFFFFFFFFFF0 | bits;  // Extend the sign to 64 bits
+            }
+            return bits;  // If positive, just return the lower 4 bits
       case PIM_INT8: return static_cast<uint64_t>(static_cast<int64_t>(static_cast<int8_t>(bits)));
       case PIM_INT16: return static_cast<uint64_t>(static_cast<int64_t>(static_cast<int16_t>(bits)));
       case PIM_INT32: return static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(bits)));

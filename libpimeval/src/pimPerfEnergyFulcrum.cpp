@@ -19,6 +19,12 @@ pimPerfEnergyFulcrum::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo
   unsigned bitsPerElement = obj.getBitsPerElement();
   unsigned numCores = obj.getNumCoresUsed();
 
+  std::cout<< "numPass: " << numPass << std::endl;
+  std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
+  std::cout<< "numCores: " << numCores << std::endl;
+  
+  std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
+
   // Fulcrum utilizes three walkers: two for input operands and one for the output operand.
   // For instructions that operate on a single operand, the next operand is fetched by the walker.
   // Consequently, only one row read operation is required in this case.
@@ -26,7 +32,13 @@ pimPerfEnergyFulcrum::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo
   // the write operation is also pipelined. Thus, only one row write operation is needed.
 
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
+<<<<<<< HEAD
   double numberOfALUOperationPerElement = ((double)bitsPerElement / m_flucrumAluBitWidth);
+=======
+  double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
+  std::cout << "numberOfALUOperationPerElement: " << numberOfALUOperationPerElement << std::endl;
+
+>>>>>>> cbad8b7 (Added Latency Formula for LUT based PIM Architecture)
   switch (cmdType)
   {
     case PimCmdEnum::POPCOUNT:
@@ -86,7 +98,19 @@ pimPerfEnergyFulcrum::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo
   unsigned numCoresUsed = obj.getNumCoresUsed();
 
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
+<<<<<<< HEAD
   double numberOfALUOperationPerElement = ((double)bitsPerElement / m_flucrumAluBitWidth);
+=======
+  double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
+
+  std::cout<< "numPass: " << numPass << std::endl;
+  std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
+  std::cout<< "numCores: " << numCoresUsed << std::endl;
+  
+  std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
+  std::cout << "numberOfALUOperationPerElement: " << numberOfALUOperationPerElement << std::endl;
+
+>>>>>>> cbad8b7 (Added Latency Formula for LUT based PIM Architecture)
   switch (cmdType)
   {
     case PimCmdEnum::ADD:

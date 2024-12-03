@@ -12,7 +12,7 @@
 #include "pimCmd.h"                    // for PimCmdEnum
 #include "pimResMgr.h"                 // for pimObjInfo
 #include <memory>                      // for std::unique_ptr
-
+#include <math.h> 
 
 namespace pimeval {
   class perfEnergy

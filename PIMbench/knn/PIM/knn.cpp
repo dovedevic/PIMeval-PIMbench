@@ -229,7 +229,7 @@ void allocatePimObject(uint64_t numOfPoints, int dimension, std::vector<PimObjId
   int idx = 0;
   if (refObj == -1)
   {
-    PimObjId obj1 = pimAlloc(PIM_ALLOC_AUTO, numOfPoints, PIM_INT32);
+    PimObjId obj1 = pimAlloc(PIM_ALLOC_AUTO, numOfPoints, PIM_INT4);
     if (obj1 == -1)
     {
       std::cout << "Abort" << std::endl;
@@ -242,7 +242,7 @@ void allocatePimObject(uint64_t numOfPoints, int dimension, std::vector<PimObjId
 
   for (; idx < dimension; ++idx)
   {
-    PimObjId obj = pimAllocAssociated(refObj, PIM_INT32);
+    PimObjId obj = pimAllocAssociated(refObj, PIM_INT4);
     if (obj == -1)
     {
       std::cout << "Abort" << std::endl;

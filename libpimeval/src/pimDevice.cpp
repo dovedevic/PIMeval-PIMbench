@@ -61,6 +61,18 @@ pimDevice::adjustConfigForSimTarget(unsigned& numRanks, unsigned& numBankPerRank
     numRows *= numSubarrayPerBank;
     numSubarrayPerBank = 1;
     break;
+<<<<<<< HEAD
+=======
+  case PIM_DEVICE_LUT:
+    std::printf("PIM-Info: Aggregate every two subarrays as a single core\n");
+      if (numSubarrayPerBank % 2 != 0) {
+        std::printf("PIM-Error: Please config even number of subarrays in each bank\n");
+        return false;
+      }
+      numRows *= 2;
+      numSubarrayPerBank /= 2;
+      break;
+>>>>>>> cbad8b7 (Added Latency Formula for LUT based PIM Architecture)
   default:
     assert(0);
   }

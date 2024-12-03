@@ -71,6 +71,7 @@ pimObjInfo::finalize()
 
   const pimRegion& region = m_regions[0];
   m_maxElementsPerRegion = (uint64_t)region.getNumAllocRows() * region.getNumAllocCols() / m_bitsPerElement;
+  // std::cout << "Subarray Size: " << (uint64_t)region.getNumAllocRows() * region.getNumAllocCols()<< std::endl;
   m_numColsPerElem = region.getNumColsPerElem();
 }
 
