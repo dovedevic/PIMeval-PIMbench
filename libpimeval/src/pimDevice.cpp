@@ -61,8 +61,6 @@ pimDevice::adjustConfigForSimTarget(unsigned& numRanks, unsigned& numBankPerRank
     numRows *= numSubarrayPerBank;
     numSubarrayPerBank = 1;
     break;
-<<<<<<< HEAD
-=======
   case PIM_DEVICE_LUT:
     std::printf("PIM-Info: Aggregate every two subarrays as a single core\n");
       if (numSubarrayPerBank % 2 != 0) {
@@ -72,7 +70,6 @@ pimDevice::adjustConfigForSimTarget(unsigned& numRanks, unsigned& numBankPerRank
       numRows *= 2;
       numSubarrayPerBank /= 2;
       break;
->>>>>>> cbad8b7 (Added Latency Formula for LUT based PIM Architecture)
   default:
     assert(0);
   }
@@ -114,6 +111,7 @@ pimDevice::isVLayoutDevice() const
   case PIM_DEVICE_BANK_LEVEL: return false;
   case PIM_DEVICE_NONE:
   case PIM_FUNCTIONAL:
+  case PIM_DEVICE_LUT:
   default:
     assert(0);
   }
@@ -137,6 +135,7 @@ pimDevice::isHLayoutDevice() const
   case PIM_DEVICE_BANK_LEVEL: return true;
   case PIM_DEVICE_NONE:
   case PIM_FUNCTIONAL:
+  case PIM_DEVICE_LUT:
   default:
     assert(0);
   }

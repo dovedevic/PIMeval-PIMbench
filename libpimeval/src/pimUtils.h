@@ -99,7 +99,8 @@ namespace pimUtils
       {PIM_DEVICE_SIMDRAM, "PIM_DEVICE_SIMDRAM"},
       {PIM_DEVICE_BITSIMD_H, "PIM_DEVICE_BITSIMD_H"},
       {PIM_DEVICE_FULCRUM, "PIM_DEVICE_FULCRUM"},
-      {PIM_DEVICE_BANK_LEVEL, "PIM_DEVICE_BANK_LEVEL"}
+      {PIM_DEVICE_BANK_LEVEL, "PIM_DEVICE_BANK_LEVEL"},
+      {PIM_DEVICE_LUT, "PIM_DEVICE_LUT"}
   };
 
   const std::unordered_map<std::string, PimDeviceEnum> strToEnumMap = {
@@ -114,7 +115,8 @@ namespace pimUtils
       {"PIM_DEVICE_SIMDRAM", PIM_DEVICE_SIMDRAM},
       {"PIM_DEVICE_BITSIMD_H", PIM_DEVICE_BITSIMD_H},
       {"PIM_DEVICE_FULCRUM", PIM_DEVICE_FULCRUM},
-      {"PIM_DEVICE_BANK_LEVEL", PIM_DEVICE_BANK_LEVEL}
+      {"PIM_DEVICE_BANK_LEVEL", PIM_DEVICE_BANK_LEVEL},
+      {"PIM_DEVICE_LUT", PIM_DEVICE_LUT}
   };
 
   static constexpr const char* envVarPimEvalTarget = "PIMEVAL_TARGET";
