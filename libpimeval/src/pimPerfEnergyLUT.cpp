@@ -20,19 +20,24 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
 
 
-   // Calculate the number of LUT operations per element
-  unsigned numberOfLUTOperationsPerElement = ceil((unsigned)bitsPerElement / m_lutBitWidth);
-
+  std::cout<< "Inside getPerfEnergyForFunc1" << std::endl;
 
   std::cout<< "numPass: " << numPass << std::endl;
   std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
   std::cout<< "numCores: " << numCores << std::endl;
+  std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
+
 
   std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
   std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
 
+   // Calculate the number of LUT operations per element
+  unsigned numberOfLUTOperationsPerElement = ceil((unsigned)bitsPerElement / m_lutBitWidth);
   std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
 
+  // m_lutReadLatency = (m_tRCD + maxElementsPerRegion * m_tCL) / maxElementsPerRegion;
+  m_lutReadLatency = m_tRCD / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
+  std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
 
   switch (cmdType)
   {
@@ -131,19 +136,26 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
   unsigned numPass = obj.getMaxNumRegionsPerCore();
   unsigned bitsPerElement = obj.getBitsPerElement();
   unsigned numCoresUsed = obj.getNumCoresUsed();
+  unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
 
   std::cout<< "numPass: " << numPass << std::endl;
   std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
   std::cout<< "numCoresUsed: " << numCoresUsed << std::endl;
+  std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
+
 
   std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
   std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
 
-  unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
+
   double numberOfLUTOperationsPerElement = ((double)bitsPerElement / m_lutBitWidth);
   std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
   double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
   std::cout << "numberOfALUOperationPerElement: " << numberOfALUOperationPerElement << std::endl;
+
+  // m_lutReadLatency = (m_tRCD + maxElementsPerRegion * m_tCL) / maxElementsPerRegion;
+  m_lutReadLatency = m_tRCD / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
+  std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
 
   switch (cmdType)
   {

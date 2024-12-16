@@ -19,6 +19,10 @@ pimPerfEnergyFulcrum::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo
   unsigned bitsPerElement = obj.getBitsPerElement();
   unsigned numCores = obj.getNumCoresUsed();
 
+  std::cout<< "numPass: " << numPass << std::endl;
+
+  // std::cout<< "Inside getPerfEnergyForFunc1" << std::endl;
+
   // Fulcrum utilizes three walkers: two for input operands and one for the output operand.
   // For instructions that operate on a single operand, the next operand is fetched by the walker.
   // Consequently, only one row read operation is required in this case.
@@ -87,6 +91,9 @@ pimPerfEnergyFulcrum::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo
 
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
   double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
+  
+  std::cout<< "numPass: " << numPass << std::endl;
+
   switch (cmdType)
   {
     case PimCmdEnum::ADD:

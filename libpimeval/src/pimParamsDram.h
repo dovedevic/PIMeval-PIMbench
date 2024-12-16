@@ -41,6 +41,8 @@ public:
   virtual double getMwIDD3N() const = 0;
   virtual double getMwRead() const = 0;
   virtual double getMwWrite() const = 0;
+  virtual double getTRCD() const = 0;
+  virtual double getTCL() const = 0;
 };
 
 #endif

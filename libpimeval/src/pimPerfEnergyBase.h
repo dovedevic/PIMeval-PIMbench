@@ -89,6 +89,9 @@ protected:
   double m_pBCore; // background power for each core in W
   double m_pBChip; // background power for each core in W
   double m_eGDL = 0.0000102; // CAS energy in mJ
+  
+  double m_tRCD; //tRCD in ms
+  double m_tCL; // tCL in ms
 };
 
 #endif

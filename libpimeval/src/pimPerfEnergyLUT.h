@@ -31,8 +31,8 @@ public:
 
 protected:
   // LUT-specific parameters for energy calculations
-  double m_lutReadLatency = 0.000000002;  // SRAM based scrathcpad memory, To crosscheck
-  double m_lutWriteLatency = 0.000000002; // SRAM based scrathcpad memory, To crosscheck
+  mutable double m_lutReadLatency;  
+  // double m_lutReadLatency = 0.000000002; 
   // unsigned m_lutBitWidth = 8;   // Width of LUT entries (in bits)
   unsigned m_lutBitWidth = 4;   // Width of LUT entries (in bits)
   double m_lutEnergyPerAccess = 0.00000001; // To change

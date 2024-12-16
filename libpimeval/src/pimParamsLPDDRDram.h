@@ -36,6 +36,9 @@ public:
   double getMwRead() const override { return m_VDD * (m_IDD4R - m_IDD3N); } // read power per chip (data copy)
   double getMwWrite() const override { return m_VDD * (m_IDD4W - m_IDD3N); } // write power per chip (data copy)
 
+  double getTRCD() const { return m_tRCD * m_tCK; } 
+  double getTCL() const { return m_CL * m_tCK; }
+
 private:
   // [dram_structure]
   std::string m_protocol;
