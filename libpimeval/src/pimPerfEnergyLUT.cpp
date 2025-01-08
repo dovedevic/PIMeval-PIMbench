@@ -20,24 +20,27 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
 
 
-  std::cout<< "Inside getPerfEnergyForFunc1" << std::endl;
+  // std::cout<< "Inside getPerfEnergyForFunc1" << std::endl;
 
-  std::cout<< "numPass: " << numPass << std::endl;
-  std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
-  std::cout<< "numCores: " << numCores << std::endl;
-  std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
+  // std::cout<< "numPass: " << numPass << std::endl;
+  // std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
+  // std::cout<< "numCores: " << numCores << std::endl;
+  // std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
 
 
-  std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
-  std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
+  // std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
+  // std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
 
    // Calculate the number of LUT operations per element
   unsigned numberOfLUTOperationsPerElement = ceil((unsigned)bitsPerElement / m_lutBitWidth);
-  std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
+  // std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
 
   // m_lutReadLatency = (m_tRCD + maxElementsPerRegion * m_tCL) / maxElementsPerRegion;
   m_lutReadLatency = m_tRCD / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
-  std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
+  // std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
+  // std::cout << "Number of LUT accesses: " << (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass) << std::endl;
+
+  m_lutEnergyPerAccess = m_eAP / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
 
   switch (cmdType)
   {
@@ -57,12 +60,16 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     {
       if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         // Calculate the number of ALU operations needed for carry handling
         unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
         unsigned numberOfALUOperationPerElement = numChunks - 1;
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumALUArithmeticEnergy * numberOfALUOperationPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       } 
       break;     
     }
@@ -71,13 +78,16 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     {
       if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
         unsigned totalShifts = (numChunks * numChunks) - numChunks;  // Except the first in each row
         unsigned totalAdditions = (numChunks * numChunks) - 1;  // Adding all the products into one result
         unsigned numberOfALUOperationPerElement = totalShifts + totalAdditions;
-        msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumShiftEnergy * totalShifts) + ((maxElementsPerRegion) * m_fulcrumALUArithmeticEnergy * totalAdditions));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       break;
     }
@@ -109,6 +119,8 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
     {
       if(bitsPerElement <= 4){
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency)) * numPass);
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
@@ -116,6 +128,8 @@ pimPerfEnergyLUT::getPerfEnergyForFunc1(PimCmdEnum cmdType, const pimObjInfo& ob
         unsigned totalOrs = (numChunks * numChunks) - 1;
         unsigned numberOfALUOperationPerElement = totalShifts + totalOrs;
         msRuntime = m_tR + m_tW + (maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)) * numPass); // Assuming LUT read latency represents LUT operation time
+        mjEnergy = numPass * numCores * ((m_eAP * 2) + ((maxElementsPerRegion - 1) * 2 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumShiftEnergy * totalShifts) + ((maxElementsPerRegion) * m_fulcrumALULogicalEnergy * totalOrs));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       break;
     }
@@ -138,24 +152,29 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
   unsigned numCoresUsed = obj.getNumCoresUsed();
   unsigned maxElementsPerRegion = obj.getMaxElementsPerRegion();
 
-  std::cout<< "numPass: " << numPass << std::endl;
-  std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
-  std::cout<< "numCoresUsed: " << numCoresUsed << std::endl;
-  std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
+  // std::cout<< "numPass: " << numPass << std::endl;
+  // std::cout<< "bitsPerElement: " << bitsPerElement << std::endl;
+  // std::cout<< "numCoresUsed: " << numCoresUsed << std::endl;
+  // std::cout<< "maxElementsPerRegion: " << maxElementsPerRegion << std::endl;
 
 
-  std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
-  std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
+  // std::cout << "m_lutBitWidth: " << m_lutBitWidth << std::endl;
+  // std::cout << "m_fulcrumAluBitWidth: " << m_fulcrumAluBitWidth << std::endl;
 
 
   double numberOfLUTOperationsPerElement = ((double)bitsPerElement / m_lutBitWidth);
-  std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
+  // std::cout << "numberOfLUTOperationsPerElement: " << numberOfLUTOperationsPerElement << std::endl;
   double numberOfALUOperationPerElement = ((double)bitsPerElement / m_fulcrumAluBitWidth);
-  std::cout << "numberOfALUOperationPerElement: " << numberOfALUOperationPerElement << std::endl;
+  // std::cout << "numberOfALUOperationPerElement: " << numberOfALUOperationPerElement << std::endl;
 
   // m_lutReadLatency = (m_tRCD + maxElementsPerRegion * m_tCL) / maxElementsPerRegion;
   m_lutReadLatency = m_tRCD / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
-  std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
+  std::cout << "Number of LUT accesses: " << (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass) << std::endl;
+
+  // std::cout << "m_lutReadLatency: " << m_lutReadLatency << std::endl;
+
+  m_lutEnergyPerAccess = m_eAP / (maxElementsPerRegion * numberOfLUTOperationsPerElement * numPass);
+
 
   switch (cmdType)
   {
@@ -164,6 +183,8 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
       if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         // Calculate the number of ALU operations needed for carry handling
@@ -171,6 +192,9 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
         unsigned numberOfALUOperationPerElement = numChunks - 1;
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)); // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumAluLatency * numberOfALUOperationPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
+
         // std::cout<< "msRuntime: " << msRuntime << std::endl;
       } 
       break;     
@@ -180,6 +204,8 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
       if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
@@ -188,6 +214,8 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
         unsigned numberOfALUOperationPerElement = totalShifts + totalAdditions;
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)); // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumShiftEnergy * totalShifts) + ((maxElementsPerRegion) * m_fulcrumALUArithmeticEnergy * totalAdditions));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       break;
     }
@@ -202,10 +230,22 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
     }
     case PimCmdEnum::SCALED_ADD:
     {
+      // also implement latency for greater than (>) 4 bit numbers!!!!!!!!!!!!!!
       // msRuntime = m_tR + m_tW + (maxElementsPerRegion * m_lutReadLatency * numberOfLUTOperationsPerElement * 2) * numPass;
-      msRuntime = m_tR + m_tW + (maxElementsPerRegion * m_lutReadLatency * numberOfLUTOperationsPerElement) + (maxElementsPerRegion * m_fulcrumAluLatency * numberOfALUOperationPerElement) * numPass;
-      mjEnergy = numCoresUsed * numPass * ((m_eAP + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement)));
-      mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
+      if(bitsPerElement <= 4){
+        msRuntime = m_tR + m_tW + (maxElementsPerRegion * m_lutReadLatency * numberOfLUTOperationsPerElement + maxElementsPerRegion * m_fulcrumAluLatency * numberOfALUOperationPerElement) * numPass;
+        // Check energy below
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_fulcrumALUArithmeticEnergy * numberOfALUOperationPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
+      }
+      else{
+        unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
+        unsigned numberOfALUOperationPerElement = numChunks - 1;
+        msRuntime = m_tR + m_tW + (maxElementsPerRegion * m_lutReadLatency * numberOfLUTOperationsPerElement + maxElementsPerRegion * (numberOfALUOperationPerElement + 1) * m_fulcrumAluLatency) * numPass;
+        // Check energy below
+        mjEnergy = numCoresUsed * numPass * ((m_eAP * 3) + ((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_fulcrumALUArithmeticEnergy * numberOfALUOperationPerElement));
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;       
+      }
       break;
     }
     case PimCmdEnum::AND:
@@ -221,6 +261,9 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
       if(bitsPerElement <= 4){
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * numberOfLUTOperationsPerElement * m_lutReadLatency; // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * (((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement));
+        mjEnergy += m_eAP * 3 * m_numChipsPerRank * m_numRanks;
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       else{
         unsigned numChunks = ceil((unsigned)bitsPerElement / m_lutBitWidth);
@@ -229,6 +272,9 @@ pimPerfEnergyLUT::getPerfEnergyForFunc2(PimCmdEnum cmdType, const pimObjInfo& ob
         unsigned numberOfALUOperationPerElement = totalShifts + totalOrs;
         msRuntime = 2 * m_tR + m_tW + maxElementsPerRegion * ((numberOfLUTOperationsPerElement * m_lutReadLatency) + (numberOfALUOperationPerElement * m_fulcrumAluLatency)); // Assuming LUT read latency represents LUT operation time
         msRuntime *= numPass;
+        mjEnergy = numCoresUsed * numPass * (((maxElementsPerRegion - 1) * 3 *  m_fulcrumShiftEnergy) + ((maxElementsPerRegion) * m_lutEnergyPerAccess * numberOfLUTOperationsPerElement) + ((maxElementsPerRegion) * m_fulcrumShiftEnergy * totalShifts) + ((maxElementsPerRegion) * m_fulcrumALULogicalEnergy * totalOrs));
+        mjEnergy += m_eAP * 3 * m_numChipsPerRank * m_numRanks;
+        mjEnergy += m_pBChip * m_numChipsPerRank * m_numRanks * msRuntime;
       }
       break;
     }

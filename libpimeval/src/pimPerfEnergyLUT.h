@@ -35,7 +35,7 @@ protected:
   // double m_lutReadLatency = 0.000000002; 
   // unsigned m_lutBitWidth = 8;   // Width of LUT entries (in bits)
   unsigned m_lutBitWidth = 4;   // Width of LUT entries (in bits)
-  double m_lutEnergyPerAccess = 0.00000001; // To change
+  mutable double m_lutEnergyPerAccess;
 
   double m_fulcrumAluLatency = 0.00000609; // 6.09ns
   unsigned m_fulcrumAluBitWidth = 32;
